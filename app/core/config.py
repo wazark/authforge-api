@@ -6,59 +6,65 @@ a strongly-typed settings object used across the app.
 """
 
 from functools import lru_cache
-from pydantic import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
     """
-    Application Settings loaded from environment variables.
+    Application settings loaded from environment variables.
     """
 
-    #AppSettings
-    projectName: str = "AuthForge"
-    apiV1Str: str = "/api/v1"
-    debug: bool = True
+    # -----------------------------
+    # App Settings
+    # -----------------------------
+    PROJECT_NAME: str = "AuthForge"
+    API_V1_STR: str = "/api/v1"
+    DEBUG: bool = True
 
-    #Security Settings
-    secretKey: str
-    algorithm: str = "HS256"
-    accessTokenExpireMinutes: int = 30
-    refreshTokenExpireDays: int = 7
+    # -----------------------------
+    # Security Settings
+    # -----------------------------
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    #Database Settings
-    postgresServer:str
-    postgresUser: str
-    postgresPassword: str
-    postgresDB: str
-    postgresPort: int = 5432
+    # -----------------------------
+    # Database Settings
+    # -----------------------------
+    POSTGRES_SERVER: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_PORT: int = 5432
 
-    #Redis
-    redisUrl: str | None = None
+    # -----------------------------
+    # Redis (optional)
+    # -----------------------------
+    REDIS_URL: str | None = None
 
-    #Pydantic Config
-
-    modelConfig = SettingsConfigDict(
-        envFile=".env",
-        caseSensitive=True
+    # -----------------------------
+    # Pydantic Config
+    # -----------------------------
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True
     )
 
     @property
-    def databaseUrl(self) -> str:
+    def database_url(self) -> str:
         """
-        Builds the SQLAchemy database URL
+        Builds the SQLAlchemy database URL.
         """
         return (
-            f"postgresql://{self.postgresUser}:{self.postgresPassword}"
-            f"@{self.postgresServer}:{self.postgresPort}/{self.postgresDB}"
+            f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-#Cached Settings Instance
+
 @lru_cache
-def getSettings() -> Settings:
-    """
-    Returns a cached instance of the settings.
-    Prevents reloading environment variables multiple times.
-    """
+def get_settings() -> Settings:
     return Settings()
 
-#Global settings object
-settings = getSettings()
+
+settings = get_settings()
