@@ -7,7 +7,10 @@ loads configuration, and includes routers.
 
 from fastapi import FastAPI
 from app.core.config import settings
+from app.db.session import engine
+from app.db.base import Base
 
+Base.metadata.create_all(bind=engine)
 
 def create_application() -> FastAPI:
     """
