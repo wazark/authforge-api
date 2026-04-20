@@ -1,4 +1,3 @@
-# app/models/role.py
 """
 Role model.
 

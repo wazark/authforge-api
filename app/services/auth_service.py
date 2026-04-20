@@ -1,4 +1,3 @@
-# app/services/auth_service.py
 """
 Authentication service.
 
@@ -6,7 +5,7 @@ Handles login, token generation, and authentication logic.
 """
 
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.repositories.user_repository import UserRepository
 from app.repositories.token_repository import TokenRepository
@@ -52,7 +51,7 @@ class AuthService:
         token_obj = Token(
             token=refresh_token,
             user_id=user.id,
-            expires_at=datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+            expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
         )
 
         self.token_repo.create(token_obj)
@@ -72,7 +71,7 @@ class AuthService:
         if not token or token.is_revoked:
             raise ValueError("Invalid refresh token")
 
-        if token.expires_at < datetime.utcnow():
+        if token.expires_at < datetime.now(timezone.utc):
             raise ValueError("Token expired")
 
         new_access_token = create_access_token(subject=token.user_id)

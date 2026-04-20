@@ -1,4 +1,3 @@
-# app/db/base.py
 """
 Base model for all SQLAlchemy models.
 """

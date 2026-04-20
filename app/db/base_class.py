@@ -1,4 +1,3 @@
-# app/db/base_class.py
 """
 Import all models here for Alembic to detect them.
 """

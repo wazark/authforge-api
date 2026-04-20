@@ -1,4 +1,3 @@
-# app/core/auth.py
 """
 Authentication dependencies.
 
@@ -14,9 +13,6 @@ from app.core.security import get_token_payload
 from app.repositories.user_repository import UserRepository
 
 
-# -----------------------------
-# Security scheme (Bearer Token)
-# -----------------------------
 security = HTTPBearer()
 
 
@@ -35,7 +31,7 @@ def get_current_user(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
+            detail="Invalid authentication credentials"
         )
 
     # Validate token type
@@ -53,7 +49,6 @@ def get_current_user(
             detail="Invalid token payload"
         )
 
-    # Fetch user from DB
     repo = UserRepository(db)
     user = repo.get_by_id(int(user_id))
 
@@ -61,6 +56,13 @@ def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found"
+        )
+
+    # 🔥 NEW: block inactive users
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user"
         )
 
     return user

@@ -1,4 +1,3 @@
-# app/schemas/auth.py
 """
 Authentication schemas.
 

@@ -1,4 +1,3 @@
-# app/services/user_service.py
 """
 User service.
 

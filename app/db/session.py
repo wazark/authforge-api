@@ -1,4 +1,3 @@
-# app/db/session.py
 """
 Database session and engine configuration.
 
@@ -11,17 +10,15 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# -----------------------------
+
 # Create SQLAlchemy Engine
-# -----------------------------
 engine = create_engine(
     settings.database_url,
     pool_pre_ping=True,  # Checks connections before using them
 )
 
-# -----------------------------
+
 # Session Factory
-# -----------------------------
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,

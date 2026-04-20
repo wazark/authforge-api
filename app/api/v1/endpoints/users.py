@@ -1,4 +1,3 @@
-# app/api/v1/endpoints/users.py
 """
 User endpoints.
 

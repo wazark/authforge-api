@@ -1,4 +1,3 @@
-# app/models/token.py
 """
 Token model.
 

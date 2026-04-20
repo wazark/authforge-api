@@ -1,4 +1,3 @@
-# app/core/security_dependencies.py
 """
 Authentication dependencies.
 
