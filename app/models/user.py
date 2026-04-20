@@ -1,9 +1,14 @@
+# app/models/user.py
 """
-User model placeholder.
-Will be expanded in the next step.
+User model.
+
+Represents application users.
 """
 
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
+from datetime import datetime
+
 from app.db.base import Base
 
 
@@ -11,3 +16,19 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+
+    # Foreign Key
+    role_id = Column(Integer, ForeignKey("roles.id"))
+
+    # Relationships
+    role = relationship("Role", back_populates="users")
+    tokens = relationship("Token", back_populates="user")

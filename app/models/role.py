@@ -1,8 +1,13 @@
+# app/models/role.py
 """
-Role model placeholder.
+Role model.
+
+Represents user roles (e.g., admin, user).
 """
 
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
 from app.db.base import Base
 
 
@@ -10,3 +15,8 @@ class Role(Base):
     __tablename__ = "roles"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    name = Column(String, unique=True, nullable=False, index=True)
+
+    # Relationship
+    users = relationship("User", back_populates="role")
