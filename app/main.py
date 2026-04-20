@@ -1,16 +1,19 @@
 # app/main.py
 """
 Application entry point.
+
+Initializes FastAPI, registers routes,
+and runs startup tasks (like DB seeding).
 """
 
 from fastapi import FastAPI
 from sqlalchemy import text
 
 from app.core.config import settings
-from app.db.session import engine
+from app.db.session import engine, SessionLocal
 from app.api.v1.router import api_router
+from app.db.init_db import init_db
 
-import app.db.base_class
 
 def create_application() -> FastAPI:
     app = FastAPI(
@@ -19,13 +22,18 @@ def create_application() -> FastAPI:
         version="1.0.0",
     )
 
+
     # Include API routes
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
+
+    # Root endpoint
     @app.get("/")
     def root():
         return {"message": f"{settings.PROJECT_NAME} is running"}
 
+
+    # Database health check
     @app.get("/health/db")
     def db_health_check():
         try:
@@ -35,7 +43,24 @@ def create_application() -> FastAPI:
         except Exception as e:
             return {"status": "Database connection FAILED", "error": str(e)}
 
+
+    # Startup event (IMPORTANT)
+    @app.on_event("startup")
+    def startup_event():
+        """
+        Runs when the application starts.
+
+        Used to initialize default data (e.g., roles).
+        """
+        db = SessionLocal()
+        try:
+            init_db(db)
+        finally:
+            db.close()
+
     return app
 
 
+
+# App instance
 app = create_application()

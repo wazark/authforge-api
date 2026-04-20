@@ -8,6 +8,9 @@ Handles user registration, login, refresh, and logout.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_current_user
+from app.models.user import User
+
 from app.core.dependencies import get_db
 from app.services.auth_service import AuthService
 from app.services.user_service import UserService
@@ -70,3 +73,15 @@ def logout(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     service = AuthService(db)
     service.logout(data.refresh_token)
     return {"message": "Logged out successfully"}
+
+
+@router.get("/me")
+def get_me(current_user: User = Depends(get_current_user)):
+    """
+    Get current authenticated user.
+    """
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "is_active": current_user.is_active
+    }

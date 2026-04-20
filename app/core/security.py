@@ -108,3 +108,17 @@ def decode_token(token: str) -> dict:
         return payload
     except JWTError:
         raise ValueError("Invalid token")
+
+def get_token_payload(token: str) -> dict:
+    """
+    Decode token and return payload safely.
+    """
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
+        )
+        return payload
+    except JWTError:
+        raise ValueError("Invalid token")
