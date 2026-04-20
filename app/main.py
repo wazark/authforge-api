@@ -6,39 +6,36 @@ loads configuration, and includes routers.
 """
 
 from fastapi import FastAPI
+from sqlalchemy import text
+
 from app.core.config import settings
 from app.db.session import engine
-from app.db.base import Base
 
-Base.metadata.create_all(bind=engine)
 
 def create_application() -> FastAPI:
-    """
-    Application factory function.
-
-    Creates and configures the FastAPI app instance.
-    """
     app = FastAPI(
         title=settings.PROJECT_NAME,
         debug=settings.DEBUG,
-        version="1.0.0"
+        version="1.0.0",
     )
-
-    # Future: include routers
-    # from app.api.v1.router import api_router
-    # app.include_router(api_router, prefix=settings.API_V1_STR)
 
     @app.get("/")
     def root():
+        return {"message": f"{settings.PROJECT_NAME} is running"}
+
+    @app.get("/health/db")
+    def db_health_check():
         """
-        Health check endpoint.
+        Checks database connectivity.
         """
-        return {
-            "message": f"{settings.PROJECT_NAME} is running"
-        }
+        try:
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+            return {"status": "Database connection OK"}
+        except Exception as e:
+            return {"status": "Database connection FAILED", "error": str(e)}
 
     return app
 
 
-# Create app instance
 app = create_application()
