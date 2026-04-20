@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.db.session import engine
 from app.api.v1.router import api_router
 
+import app.db.base_class
 
 def create_application() -> FastAPI:
     app = FastAPI(

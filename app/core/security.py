@@ -23,7 +23,18 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(password: str) -> str:
     """
     Hash a plain password.
+    Ensures proper encoding and bcrypt safety.
     """
+
+    if not isinstance(password, str):
+        raise ValueError("Password must be a string")
+
+    # Normalize and enforce max length for bcrypt
+    password = password.strip()
+
+    if len(password.encode("utf-8")) > 72:
+        raise ValueError("Password too long (max 72 bytes)")
+
     return pwd_context.hash(password)
 
 
@@ -31,6 +42,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify a password against a hash.
     """
+    plain_password = plain_password.strip()
     return pwd_context.verify(plain_password, hashed_password)
 
 
