@@ -17,6 +17,9 @@ from app.core.security import (
 from app.models.token import Token
 from app.core.config import settings
 
+from app.core.security import decode_token
+from app.repositories.blacklist_repository import BlacklistRepository
+
 
 class AuthService:
     def __init__(self, db: Session):
@@ -81,11 +84,27 @@ class AuthService:
             "token_type": "bearer"
         }
 
-    def logout(self, refresh_token: str):
+    def logout(self, refresh_token: str, access_token: str):
         """
-        Revoke refresh token.
+        Revoke refresh token AND blacklist access token.
         """
+
+        
+        # Revoke refresh token
         token = self.token_repo.get(refresh_token)
 
         if token:
             self.token_repo.revoke(token)
+
+        
+        # Blacklist ACCESS token
+        try:
+            payload = decode_token(access_token)
+            jti = payload.get("jti")
+
+            if jti:
+                blacklist = BlacklistRepository(self.token_repo.db)
+                blacklist.add(jti)
+
+        except Exception:
+            pass  # avoid breaking logout
