@@ -1,21 +1,20 @@
 # 🚀 AuthForge API
 
-A **production-ready authentication system** built with **FastAPI**, following clean architecture and modern backend best practices.
+A **production-ready authentication system** built with **FastAPI**, following clean architecture and real-world backend practices.
 
 ---
 
 ## 🧩 Overview
 
-AuthForge is a modular and scalable authentication system designed to simulate a real-world backend service.
-It includes secure user authentication, token management, and a clean separation of concerns.
+AuthForge is a modular and scalable authentication service designed to simulate a **real-world backend system**.
 
-This project is intended as a **portfolio-level backend system** demonstrating professional engineering standards.
+It provides secure authentication, token lifecycle management, and a clean separation of concerns, making it suitable for production-like environments and portfolio demonstration.
 
 ---
 
 ## ⚙️ Tech Stack
 
-* **Python 3.11**
+* **Python 3.14**
 * **FastAPI**
 * **PostgreSQL**
 * **SQLAlchemy (ORM)**
@@ -24,6 +23,7 @@ This project is intended as a **portfolio-level backend system** demonstrating p
 * **Passlib (bcrypt hashing)**
 * **Docker & Docker Compose**
 * **Pytest (testing)**
+* **SlowAPI (rate limiting)**
 
 ---
 
@@ -37,13 +37,13 @@ app/
 ├── core/           # Config, security, dependencies
 ├── db/             # Database setup
 ├── models/         # SQLAlchemy models
-├── schemas/        # Pydantic schemas
 ├── repositories/   # Data access layer
+├── schemas/        # Pydantic schemas
 ├── services/       # Business logic
 ├── tests/          # Unit tests
 ```
 
-### Principles:
+### Principles
 
 * Separation of concerns
 * Scalability
@@ -63,27 +63,25 @@ app/
 * Password hashing (bcrypt)
 * Protected routes
 * Basic role system (user/admin)
-* Logout (refresh token revocation)
+* Logout (refresh token revocation + access token blacklist)
 * Input validation (Pydantic)
+* Rate limiting (login protection)
 
 ---
 
-### 🚧 Planned Improvements
+## 🔐 Security Highlights
 
-* Role-based authorization (RBAC enforcement)
-* Token blacklist (true logout for access tokens)
-* Rate limiting
-* Login attempt tracking
-* Email verification (mocked)
-* Password reset flow
-* Two-factor authentication (2FA)
-* Audit logging
+* Secure password hashing (bcrypt)
+* Token-based authentication (JWT)
+* Token invalidation via blacklist (JTI)
+* Refresh token persistence and revocation
+* Rate limiting against brute-force attacks
 
 ---
 
 ## 🐳 Running with Docker
 
-### 1. Build and start services
+### Start services
 
 ```bash
 docker compose up --build
@@ -91,7 +89,7 @@ docker compose up --build
 
 ---
 
-### 2. Access the API
+### Access
 
 * API: http://localhost:8000
 * Docs: http://localhost:8000/docs
@@ -108,8 +106,11 @@ pytest -v
 
 * User registration
 * User login
-* Protected route (/auth/me)
-* Invalid login
+* Protected routes
+* Invalid credentials
+* Logout invalidation
+* Role-based access
+* Rate limiting
 
 ---
 
@@ -121,33 +122,47 @@ pytest -v
    * access_token
    * refresh_token
 3. Use access_token for protected routes
-4. Refresh access_token using refresh_token
-5. Logout → refresh token revoked
+4. Refresh access token when expired
+5. Logout:
+
+   * refresh token revoked
+   * access token blacklisted
+
+---
+
+## 🗄️ Database Models
+
+* **User**
+* **Role**
+* **Token (refresh tokens)**
+* **BlacklistedToken (revoked access tokens)**
 
 ---
 
 ## ⚠️ Environment Variables
 
-Create a `.env` file:
+### `.env` (local development)
 
 ```env
-# App
-PROJECT_NAME=AuthForge
-API_V1_STR=/api/v1
-DEBUG=True
+POSTGRES_SERVER=localhost
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=authforge
+POSTGRES_PORT=5432
 
-# Security
 SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_DAYS=7
+```
 
-# Database
+### `.env.docker`
+
+```env
 POSTGRES_SERVER=db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_DB=authforge
 POSTGRES_PORT=5432
+
+SECRET_KEY=your_secret_key
 ```
 
 ---
@@ -155,35 +170,29 @@ POSTGRES_PORT=5432
 ## 🧠 What This Project Demonstrates
 
 * Clean backend architecture
-* Real-world authentication flows
-* Secure password handling
+* Secure authentication flows
 * Token lifecycle management
+* Real-world logout strategy (blacklist)
 * Dockerized environment
 * Database migrations with Alembic
 * Automated testing
+* API protection via rate limiting
 
 ---
 
-## 📌 Future Improvements
+## 🚧 Next Steps
 
-This project is actively evolving to include:
-
-* Advanced security mechanisms
-* Distributed caching (Redis)
-* Full RBAC system
-* Production-grade observability
+* Audit logging (security tracking)
+* Email verification
+* Password reset flow
+* Two-factor authentication (2FA)
+* Redis integration (caching / rate limiting)
 
 ---
 
 ## 👨‍💻 Author
 
 Built as a backend engineering project focused on **real-world production patterns**.
-
----
-
-## ⭐ Contributing
-
-Feel free to fork, explore, and improve the project.
 
 ---
 
