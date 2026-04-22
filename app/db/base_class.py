@@ -12,3 +12,4 @@ from app.models.user import User  # noqa
 from app.models.role import Role  # noqa
 from app.models.token import Token  # noqa
 from app.models.blacklisted_token import BlacklistedToken  # noqa
+from app.models.audit_log import AuditLog  # noqa

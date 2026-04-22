@@ -21,11 +21,14 @@ from app.core.config import settings
 from app.core.security import decode_token
 from app.repositories.blacklist_repository import BlacklistRepository
 
+from app.repositories.audit_log_repository import AuditLogRepository
+
 
 class AuthService:
     def __init__(self, db: Session):
         self.user_repo = UserRepository(db)
         self.token_repo = TokenRepository(db)
+        self.audit_repo = AuditLogRepository(db)
 
     def authenticate_user(self, email: str, password: str):
         """
@@ -44,8 +47,15 @@ class AuthService:
         """
         Perform login and return tokens.
         """
+
         user = self.authenticate_user(email, password)
+
         if not user:
+            # FAILED LOGIN
+            self.audit_repo.create(
+                action="login_failed",
+                details={"email": email}
+            )
             raise ValueError("Invalid credentials")
 
         access_token = create_access_token(subject=user.id)
@@ -60,6 +70,12 @@ class AuthService:
 
         self.token_repo.create(token_obj)
 
+        # SUCCESS LOGIN
+        self.audit_repo.create(
+            action="login_success",
+            user_id=user.id
+        )
+
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
@@ -70,6 +86,7 @@ class AuthService:
         """
         Refresh access token.
         """
+
         token = self.token_repo.get(refresh_token)
 
         if not token or token.is_revoked:
@@ -79,6 +96,11 @@ class AuthService:
             raise ValueError("Token expired")
 
         new_access_token = create_access_token(subject=token.user_id)
+
+        self.audit_repo.create(
+            action="token_refresh",
+            user_id=token.user_id
+        )
 
         return {
             "access_token": new_access_token,
@@ -90,14 +112,17 @@ class AuthService:
         Revoke refresh token AND blacklist access token.
         """
 
-        
-        # Revoke refresh token
         token = self.token_repo.get(refresh_token)
 
         if token:
             self.token_repo.revoke(token)
 
-        
+            # 🔥 LOG LOGOUT
+            self.audit_repo.create(
+                action="logout",
+                user_id=token.user_id
+            )
+
         # Blacklist ACCESS token
         try:
             payload = decode_token(access_token)
@@ -108,4 +133,4 @@ class AuthService:
                 blacklist.add(jti)
 
         except Exception:
-            pass  # avoid breaking logout
+            pass
