@@ -1,3 +1,4 @@
+#app/services/user_service.py
 """
 User service.
 
@@ -9,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.core.security import hash_password
+from app.models.role import Role
 
 
 class UserService:
@@ -16,16 +18,16 @@ class UserService:
         self.repo = UserRepository(db)
 
     def create_user(self, email: str, password: str) -> User:
-        """
-        Register a new user.
-        """
         existing_user = self.repo.get_by_email(email)
         if existing_user:
             raise ValueError("User already exists")
 
+        role = self.repo.db.query(Role).filter(Role.name == "user").first()
+
         user = User(
             email=email,
-            hashed_password=hash_password(password)
+            hashed_password=hash_password(password),
+            role_id=role.id if role else None
         )
 
         return self.repo.create(user)

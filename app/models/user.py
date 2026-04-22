@@ -1,3 +1,4 @@
+#app/models/user.py
 """
 User model.
 
@@ -6,7 +7,7 @@ Represents application users.
 
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.base import Base
 
@@ -22,8 +23,8 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     # Foreign Key
     role_id = Column(Integer, ForeignKey("roles.id"))

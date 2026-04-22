@@ -1,3 +1,4 @@
+#app/core/auth.py
 """
 Authentication dependencies.
 

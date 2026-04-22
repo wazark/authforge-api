@@ -1,3 +1,4 @@
+#app/main.py
 """
 Application entry point.
 """

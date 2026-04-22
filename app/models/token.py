@@ -1,3 +1,4 @@
+#app/models/token.py
 """
 Token model.
 
@@ -6,7 +7,7 @@ Stores refresh tokens and supports token invalidation.
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.base import Base
 
@@ -23,7 +24,7 @@ class Token(Base):
     is_revoked = Column(Boolean, default=False)
 
     expires_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     # Relationship
     user = relationship("User", back_populates="tokens")

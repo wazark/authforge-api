@@ -1,3 +1,4 @@
+#app/tests/test_auth.py
 def test_register(client):
     response = client.post(
         "/api/v1/auth/register",
@@ -137,3 +138,30 @@ def test_logout_invalidates_token(client):
         "Token revoked",
         "Invalid authentication credentials"
     ]
+
+def test_user_cannot_access_admin(client):
+    # Register user (default = user role)
+    client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "user@test.com",
+            "password": "123456"
+        }
+    )
+
+    login = client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "user@test.com",
+            "password": "123456"
+        }
+    )
+
+    token = login.json()["access_token"]
+
+    response = client.get(
+        "/api/v1/users/admin-only",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 403

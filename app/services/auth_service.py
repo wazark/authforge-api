@@ -1,3 +1,4 @@
+#app/services/auth_service.py
 """
 Authentication service.
 

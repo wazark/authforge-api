@@ -1,3 +1,4 @@
+#env.py do alembic
 import sys
 import os
 

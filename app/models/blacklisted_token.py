@@ -1,3 +1,4 @@
+#app/models/blacklisted_token.py
 """
 BlacklistedToken model.
 
