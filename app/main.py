@@ -11,6 +11,8 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
 from app.db.session import engine, SessionLocal
 from app.api.v1.router import api_router
@@ -42,6 +44,15 @@ def create_application() -> FastAPI:
         debug=settings.DEBUG,
         version="1.0.0",
         lifespan=lifespan,
+    )
+
+    # CORS CONFIG (ESSENCIAL PARA FLUTTER WEB)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Em produção, restringir
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     # Rate Limiter
